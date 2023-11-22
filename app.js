@@ -85,14 +85,16 @@ app.get('/states/', logger, async (request, response) => {
 
   const dbuser = await db.all(getallquery)
 
-  const value = dbuser => {
-    ;(stateId = dbuser.state_id),
-      (stateName = dbuser.state_name),
-      (population = dbuser.population)
+ const convertstate = dbobject => {
+    return {
+      stateId: dbobject.state_id,
+      stateName: dbobject.state_name,
+      population: dbobject.population,
+    }
   }
   response.send(
     dbuser.map(each => {
-      value(each)
+      convertstate(each)
     }),
   )
 })
@@ -124,14 +126,16 @@ app.get('/districts/:districtId/', logger, async (request, response) => {
   const getquery = `select * from district where district_id=${districtId};`
 
   const dbuser = await db.get(getquery)
-  const value = () => {
-    ;(districtId = dbuser.district_id),
-      (districtName = dbuser.district_name),
-      (stateId = dbuser.state_id),
-      (cases = dbuser.cases),
-      (cured = dbuser.cured),
-      (active = dbuser.active),
-      (deaths = dbuser.deaths)
+  const value = (dboject) => {
+    return{
+    districtId : dboject.district_id,
+      districtName : dboject.district_name,
+      stateId : dboject.state_id,
+      cases : dboject.cases,
+      cured : dboject.cured,
+      active : dboject.active,
+      deaths : dboject.deaths
+      }
   }
   response.send(value(dbuser))
 })
@@ -166,7 +170,7 @@ app.get('/states/:stateId/stats/', logger, async (request, response) => {
   sum(cured),
   sum(active),
   sum(deaths) from district where state_id=${stateId};`
-  const stats = await db.run(getstatquery)
+  const stats = await db.get(getstatquery)
   response.send({
     totalCases: stats['sum(cases)'],
     totalCured: stats['sum(cured)'],
